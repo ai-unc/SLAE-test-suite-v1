@@ -1,0 +1,10 @@
+"Pipeline","https://github.com/thomasefbland/SLAE-example-pipeline/commit/5291c31d8a6a5f9dd1d17e25d1ce3878d2febabb"
+"Executed By","'Thomas Bland <thomasefbland@gmail.com>'"
+"Date","10-12-2024-21:51:46"
+"Runtime","0:00:00.000020"
+"Total Documents","2"
+
+"Document Name","Independent Variable","Dependent Variable","Predicted Classification","Coded Classification"
+"Ackert et al_2020_Countering tobacco industry tactics on the eco","Menthol Flavor Ban","Convenience store sales","-","-"
+"Asare et al_2022_Association of Cigarette Sales With Comprehensi","Comprehensive Flavored tobacco ban","Menthol Cigarette sales (+) (+) (+)","-","-"
+"Asare et al_2022_Association of Cigarette Sales With Comprehensi","Comprehensive Flavored tobacco ban","Sales of non flavored cigarettes","-","+"
