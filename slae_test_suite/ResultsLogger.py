@@ -57,6 +57,16 @@ class ResultsLogger:
 
     def __init__(self, is_verbose=True):
         self.is_verbose = is_verbose
+
+        # Get pipeline repo url
+        output = subprocess.run(
+            ["git", "remote", "get-url", "origin"], capture_output=True, text=True
+        )
+        if output.returncode != 0:
+            print(output.stderr)
+            exit(1)
+        self.__pipeline_repo_url = output.stdout[:-5]
+
         # Check in and commit code
         output = subprocess.run(["git", "add", "."], capture_output=True, text=True)
         if output.returncode != 0:
@@ -82,15 +92,6 @@ class ResultsLogger:
             print(output.stderr)
             exit(1)
         self.__commit_hash = output.stdout[:-1]
-
-        # Get pipeline repo url
-        output = subprocess.run(
-            ["git", "remote", "get-url", "origin"], capture_output=True, text=True
-        )
-        if output.returncode != 0:
-            print(output.stderr)
-            exit(1)
-        self.__pipeline_repo_url = output.stdout[:-5]
 
         # Get git user name
         output = subprocess.run(
