@@ -1,6 +1,6 @@
 import subprocess
 from datetime import datetime
-from typing import List, Set
+from typing import List, Set, Literal
 import csv
 import io
 import requests
@@ -24,8 +24,8 @@ class Result:
         document_name: str,
         independent_variable: str,
         dependent_variable: str,
-        predicted_classification: str,
-        coded_classification: str,
+        predicted_classification: Literal["+", "-", "I", "N/A"],
+        coded_classification: Literal["+", "-", "I", "N/A"],
     ):
         self.document_name = document_name
         self.independent_variable = independent_variable
@@ -174,11 +174,11 @@ class ResultsLogger:
         url = f"https://api.github.com/repos/ai-unc/SLAE-test-suite-v1/contents/results/{self.__pipeline_repo_url.split("/")[-1]}/{self.__datetime}.csv"
         payload = {
             "message": "Automated Commit by Test Suite",
-            "content": encoded_content
+            "content": encoded_content,
         }
         headers = {
             "Authorization": f"token {GITHUB_TOKEN}",
-            "Accept": "application/vnd.github.v3+json"
+            "Accept": "application/vnd.github.v3+json",
         }
         response = requests.put(url, headers=headers, data=json.dumps(payload))
         if response.status_code == 201:
@@ -188,5 +188,8 @@ class ResultsLogger:
             print("Status Code:", response.status_code)
             print("Response:", response.json())
             print("Writing results to local csv file")
-            with open(f"local_{self.__pipeline_repo_url.split("/")[-1]}_{self.__datetime}.csv", 'w') as file:
+            with open(
+                f"local_{self.__pipeline_repo_url.split("/")[-1]}_{self.__datetime}.csv",
+                "w",
+            ) as file:
                 file.write(csv_string)
