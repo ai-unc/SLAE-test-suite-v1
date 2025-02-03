@@ -172,7 +172,7 @@ class ResultsLogger:
 
         GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
         encoded_content = base64.b64encode(csv_string.encode()).decode()
-        url = f"https://api.github.com/repos/ai-unc/SLAE-test-suite-v1/contents/results/{self.__pipeline_repo_url.split("/")[-1]}/{self.__datetime}.csv"
+        url = f"https://api.github.com/repos/ai-unc/SLAE-test-suite-v1/contents/results/{self.__pipeline_repo_url.split('/')[-1]}/{self.__datetime}.csv"
         payload = {
             "message": "Automated Commit by Test Suite",
             "content": encoded_content,
