@@ -1,3 +1,4 @@
+import argparse
 import subprocess
 from datetime import datetime
 from typing import List, Set, Literal
@@ -10,6 +11,30 @@ from dotenv import load_dotenv
 import os
 
 load_dotenv()
+
+test_suite_version: str = "1.1.0"
+
+
+def create_results_logger(is_verbose=False):
+    parser = argparse.ArgumentParser(
+        description="Check if --log-results flag is passed."
+    )
+    parser.add_argument(
+        "--log-results", action="store_true", help="Enable logging of results"
+    )
+    args = parser.parse_args()
+    if args.log_results:
+        confirm = (
+            input("Are you sure you want to log results to the shared repo? (Y/N): ")
+            .strip()
+            .lower()
+        )
+        if confirm != "y":
+            print("Logging canceled, exiting program.")
+            exit(0)
+
+    logger = _ResultsLogger(is_verbose, is_enabled=args.log_results)
+    return logger
 
 
 class Result:
@@ -43,7 +68,7 @@ class Result:
         ]
 
 
-class ResultsLogger:
+class _ResultsLogger:
     __executed_by: str
     __commit_hash: str
     __pipeline_repo_url: str
@@ -54,9 +79,15 @@ class ResultsLogger:
     __total_correct: int = 0
     # Debug
     is_verbose: bool
+    is_enabled: bool
 
-    def __init__(self, is_verbose=True):
+    def __init__(self, is_verbose=True, is_enabled=False):
         self.is_verbose = is_verbose
+        self.is_enabled = is_enabled
+
+        if is_enabled == False:
+            print("Results Logger is disabled")
+            return
 
         # Get pipeline repo url
         output = subprocess.run(
@@ -118,6 +149,8 @@ class ResultsLogger:
         predicted_classification: str,
         coded_classification: str,
     ) -> None:
+        if self.is_enabled == False:
+            return
         if self.__runtime == None:
             self.__runtime = datetime.now()
             print(f"Starting test at {self.__runtime} executed by {self.__executed_by}")
@@ -139,7 +172,9 @@ class ResultsLogger:
                 f"{document_name}: {independent_variable} -> {dependent_variable}, Predicted: {predicted_classification}, Coded: {coded_classification}"
             )
 
-    def save_results(self):
+    def save_results(self) -> None:
+        if self.is_enabled == False:
+            return
         self.__runtime = datetime.now() - self.__runtime
         print(
             f"Total Accuracy: {(self.__total_correct / len(self.__data) * 100):.2f}% ({self.__total_correct} / {len(self.__data)} Coded Relations)"
@@ -172,9 +207,9 @@ class ResultsLogger:
 
         GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
         encoded_content = base64.b64encode(csv_string.encode()).decode()
-        url = f"https://api.github.com/repos/ai-unc/SLAE-test-suite-v1/contents/results/{self.__pipeline_repo_url.split('/')[-1]}/{self.__datetime}.csv"
+        url = f"https://api.github.com/repos/ai-unc/SLAE-test-suite-v1/contents/results/{'/'.join(self.__pipeline_repo_url.split('/')[-2:])}/{self.__datetime}.csv"
         payload = {
-            "message": "Automated Commit by Test Suite",
+            "message": f"Automated Commit by Test Suite v{test_suite_version}",
             "content": encoded_content,
         }
         headers = {
