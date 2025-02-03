@@ -190,7 +190,7 @@ class ResultsLogger:
             print("Response:", response.json())
             print("Writing results to local csv file")
             with open(
-                f"local_{self.__pipeline_repo_url.split("/")[-1]}_{self.__datetime}.csv",
+                f"local_{self.__pipeline_repo_url.split('/')[-1]}_{self.__datetime}.csv",
                 "w",
             ) as file:
                 file.write(csv_string)
